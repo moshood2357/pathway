@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<style>
+    .btn-orange {
+        background-color: orange;
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+
+    .hero-section {
+        background-color: #f8f9fa;
+        padding: 5rem 0;
+        min-height: 70vh;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-text {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .hero-illustration {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        background-size: contain;
+    }
+
+    .about-section, .how-it-works-section {
+        padding: 5rem 0;
+        background-color: white;
+    }
+
+    .about-title, .how-it-works-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 3rem;
+        text-decoration: underline;
+    }
+
+    .how-it-works-cards .card {
+        border: none;
+        text-align: center;
+        padding: 2rem 1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .how-it-works-cards .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .how-it-works-icon {
+        font-size: 3rem;
+        color: orange;
+        margin-bottom: 1rem;
+    }
+
+    .contact-section {
+        padding: 5rem 0;
+    }
+
+    .contact-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 3rem;
+        text-decoration: underline;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section" id="home">
+    <div class="container">
+        <div class="row flex align-items-center py-5">
+            <div class="col-md-6">
+                <h1 class="hero-title">Find your personalized path to your dream job</h1>
+                <p class="hero-text">
+                    Pathway calculates the steps you need to progress in your career,
+                    identifying the roles and skills required to reach your goals
+                </p>
+                <a class="btn btn-orange" href="{{ url_for('auth.Sign_up')}}">Get Started</a>
+            </div>
+            <div class="col-md-6">
+                <div class="hero-illustration mx-auto">
+                    <img src="{{url_for('static', filename='images/path.png')}}" style="height: 300px" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+    <div class="container">
+        <h2 class="about-title">About us</h2>
+        <div class="row flex align-items-center">
+            <div class="col-md-6">
+                <img src="/static/images/path-about.png" style="height: 300px" alt="Pathway">
+            </div>
+            <div class="col-md-6">
+                <p class="mb-4">
+                    At Pathway, we believe that every student and professional - junior, mid or senior - deserves a clear and achievable route to
+                    their dream career. Too often, employees have big ambitions but lack the roadmap,
+                    guidance, or tools to get there. That's where we come in.
+                </p>
+                <p class="mb-4">
+                    <strong>Pathway is a human-powered career development platform</strong> that helps you chart a 
+                    personalized career journey from where you are to where you want to be. Whether you're
+                    aiming for a promotion, switching industries, or pursuing a long-term dream role, Pathway
+                    identifies the steps, roles, and skills you need to progress confidently.
+                </p>
+                <ul class="mb-4">
+                    <li>Analyzes your current skill set and highlights areas for growth.</li>
+                    <li>Recommends targeted learning paths and job roles.</li>
+                    <li>Tracks your readiness for each career step.</li>
+                </ul>
+                <p>
+                    With Pathway, you're never guessing—you're growing. Join thousands of professionals
+                    using Pathway to take control of their careers with clarity, confidence, and purpose.
+                </p>
+                
+                <!-- See More Button -->
+                <div class="mt-4">
+                    <a href="{{ url_for('views.about') }}" class="btn btn-orange px-4 py-2">See More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section" id="how-it-works">
+    <div class="container">
+        <h2 class="how-it-works-title">How It Works</h2>
+        <div class="row how-it-works-cards">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="how-it-works-icon"><i class="bi bi-person-check"></i></div>
+                    <h5>1. Assess Yourself</h5>
+                    <p>Take a quick assessment to identify your current skills and career preferences.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="how-it-works-icon"><i class="bi bi-gear-fill"></i></div>
+                    <h5>2. Get Your Roadmap</h5>
+                    <p>Receive a personalized career roadmap with the steps and skills you need to reach your goals.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="how-it-works-icon"><i class="bi bi-award-fill"></i></div>
+                    <h5>3. Achieve Your Goals</h5>
+                    <p>Follow the suggested steps, track your progress, and reach your dream career confidently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section" id="contact">
+    <div class="container">
+        <h2 class="contact-title">Have a message for us?</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter your name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email address">
+                    </div>
+                    <div class="mb-4">
+                        <textarea class="form-control" rows="6" placeholder="Enter your message"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-orange w-100">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

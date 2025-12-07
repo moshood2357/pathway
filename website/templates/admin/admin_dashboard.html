@@ -1,0 +1,812 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block style %}
+{{ super() }}
+<style>
+    .signin-container {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .signin-box {
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+    }
+    .form-control {
+        padding: 14px;
+        border-radius: 8px;
+    }
+    .btn-warning {
+        background-color: rgb(255, 165, 0);
+        border: none;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    .btn-warning:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+    .btn-outline-warning {
+        border: 2px solid rgb(255, 165, 0);
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+
+.tab-section {
+    display: none;
+}
+.tab-section.active {
+    display: block;
+}
+
+</style>
+{% endblock style %}
+
+
+{% block content %}
+
+<!-- DASHBOARD CARDS -->
+<div class="container py-5">
+    <div class="row justify-content-center g-4">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container position-fixed top-0 translate-middle-x mt-3" style="left: 65%; z-index: 1050; width: auto; max-width: 480px;">
+      {% for ca, mesg in messages %}
+        <div class="alert alert-{{ ca }} alert-dismissible fade show shadow mb-2" role="alert">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">{{ mesg }}</span>
+            <button type="button" class="btn-close btn-close-white btn-sm bg-primary-subtle rounded-4" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+        <!-- Total Users -->
+        <div class="col-md-4">
+            <div class="dashboard-card card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-center text-center">
+                    <h6 class="text-muted">Total Users</h6>
+                    <h2 class="fw-bold">{{ total_users }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- New signups -->
+        <div class="col-md-4">
+            <div class="dashboard-card card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-center text-center">
+                    <h6 class="text-muted">New Sign ups</h6>
+                    <h2 class="fw-bold">{{ new_signups }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Admins -->
+        <div class="col-md-4">
+            <div class="dashboard-card card shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body d-flex flex-column justify-content-center text-center">
+                    <h6 class="text-muted">Active Users</h6>
+                    <h2 class="fw-bold">{{ dau }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- tab section -->
+ <ul class="nav nav-tabs mb-4" id="adminTabs">
+    <li class="nav-item">
+        <button type="button" class="nav-link active" data-tab="skillsTab" data-bs-toggle="none">
+            Manage Skills
+        </button>
+    </li>
+
+    <li class="nav-item">
+        <button type="button" class="nav-link" data-tab="careersTab">
+            Manage Careers
+        </button>
+    </li>
+     <li class="nav-item">
+        <button type="button" class="nav-link active" data-tab="professionalsTab" data-bs-toggle="none">
+            Manage professionals
+        </button>
+    </li>
+     <li class="nav-item">
+        <button type="button" class="nav-link active" data-tab="communityTab" data-bs-toggle="none">
+            Manage Community
+        </button>
+    </li>
+</ul>
+
+
+
+<!-- skill tab section -->
+<!-- SKILLS MANAGEMENT -->
+<div  id="skillsTab" class="tab-section">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Skills</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSkillModal">
+            Add Skill
+        </button>
+    </div>
+
+    <!-- Skills Table -->
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Skill Name</th>
+                <th>Category</th>
+                <th style="width:180px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in skills %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ s.skill_name }}</td>
+                <td>{{ s.category }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editSkillModal{{ s.skill_id }}">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteSkillModal{{ s.skill_id }}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editSkillModal{{ s.skill_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="POST" action="/edit_skill/{{ s.skill_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ add_skill_form.csrf_token._value() }}">
+
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5>Edit Skill</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <label>Skill Name</label>
+                                <input type="text" name="skill_name"
+                                       class="form-control"
+                                       value="{{ s.skill_name }}" required>
+
+                                <label class="mt-3">Category</label>
+                                <select name="category" class="form-control" required>
+                                    <option value="Technical" {{ 'selected' if s.category == 'Technical' else '' }}>Technical</option>
+                                    <option value="Soft" {{ 'selected' if s.category == 'Soft' else '' }}>Soft</option>
+                                    <option value="Other" {{ 'selected' if s.category == 'Other' else '' }}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-warning" type="submit">Save Changes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteSkillModal{{ s.skill_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>Confirm Delete</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to delete
+                            <strong>{{ s.skill_name }}</strong>?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="/delete_skill/{{ s.skill_id }}" class="btn btn-danger">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Add Skill Modal -->
+<div class="modal fade" id="addSkillModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('admin.add_skill') }}">
+            {{ add_skill_form.hidden_tag() }}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        {{ add_skill_form.skill_name.label(class="form-label") }}
+                        {{ add_skill_form.skill_name(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_skill_form.category.label(class="form-label") }}
+                        {{ add_skill_form.category(class="form-select") }}
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Add Skill</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- career tab section -->
+ <div id="careersTab" class="tab-section">
+     <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Careers</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCareerModal">
+            Add Career
+        </button>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Career Name</th>
+                <th>Description</th>
+                <th>Demand Level</th>
+                <th>Average Salary</th>
+                <th style="width:180px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for c in careers %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ c.career_name }}</td>
+                <td>{{ c.description[:50] }}...</td>
+                <td>{{ c.demand_level }}</td>
+                <td>₦{{ c.average_salary }}</td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editCareerModal{{ c.career_id }}">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteCareerModal{{ c.career_id }}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+            <!-- Edit Career Modal -->
+            <div class="modal fade" id="editCareerModal{{ c.career_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="POST" action="/edit_career/{{ c.career_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ add_career_form.csrf_token._value() }}">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5>Edit Career</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <label>Career Name</label>
+                                <input type="text" name="career_name"
+                                       class="form-control"
+                                       value="{{ c.career_name }}" required>
+
+                                <label class="mt-3">Description</label>
+                                <textarea name="description" class="form-control" rows="3" required>{{ c.description }}</textarea>
+
+                                <label class="mt-3">Demand Level</label>
+                                <select name="demand_level" class="form-control" required>
+                                    <option value="High" {{ 'selected' if c.demand_level == 'High' else '' }}>High</option>
+                                    <option value="Medium" {{ 'selected' if c.demand_level == 'Medium' else '' }}>Medium</option>
+                                    <option value="Low" {{ 'selected' if c.demand_level == 'Low' else '' }}>Low</option>
+                                </select>
+
+                                <label class="mt-3">Average Salary (NGN)</label>
+                                <input type="number" name="average_salary" class="form-control"
+                                       value="{{ c.average_salary }}">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-warning" type="submit">Save Changes</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Career Modal -->
+            <div class="modal fade" id="deleteCareerModal{{ c.career_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5>Confirm Delete</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to delete
+                            <strong>{{ c.career_name }}</strong>?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="/delete_career/{{ c.career_id }}" class="btn btn-danger">Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+<div class="modal fade" id="addCareerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('admin.add_career') }}">
+            {{ add_career_form.hidden_tag() }}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Career</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        {{ add_career_form.career_name.label(class="form-label") }}
+                        {{add_career_form.career_name(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_career_form.description.label(class="form-label") }}
+                        {{ add_career_form.description(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_career_form.demand_level.label(class="form-label") }}
+                        {{ add_career_form.demand_level(class="form-select") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_career_form.average_salary.label(class="form-label") }}
+                        {{ add_career_form.average_salary(class="form-control") }}
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Add Career</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- PROFESSIONALS TAB -->
+<div id="professionalsTab" class="tab-section">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Professionals</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProfessionalModal">
+            Add Professional
+        </button>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>LinkedIn</th>
+                <th>Career</th>
+                <th style="width:180px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for p in professional %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ p.first_name }}</td>
+                <td>{{ p.last_name }}</td>
+                <td>{{ p.email }}</td>
+                <td>{{ p.linkedin_id or 'None' }}</td>
+                <td>{{ p.career.career_name if p.career else 'None' }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editProfessionalModal{{ p.professional_id }}">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteProfessionalModal{{ p.professional_id }}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+            <!-- Edit Professional Modal -->
+            <div class="modal fade" id="editProfessionalModal{{ p.professional_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="POST" action="/edit_professional/{{ p.professional_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ add_career_form.csrf_token._value() }}">
+                        <div class="modal-content">
+                            
+                            <div class="modal-header">
+                                <h5>Edit Professional</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <label>First Name</label>
+                                <input type="text" name="first_name" class="form-control" value="{{ p.first_name }}" required>
+
+                                <label class="mt-3">Last Name</label>
+                                <input type="text" name="last_name" class="form-control" value="{{ p.last_name }}" required>
+
+                                <label class="mt-3">Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ p.email }}" required>
+
+                                <label class="mt-3">LinkedIn ID</label>
+                                <input type="text" name="linkedin_id" class="form-control" value="{{ p.linkedin_id }}">
+
+                                <label class="mt-3">Career</label>
+                                <select name="career_id" class="form-select">
+                                    <option value="">-- Select Career --</option>
+                                    {% for c in careers %}
+                                    <option value="{{ c.career_id }}" {% if p.career and p.career.career_id == c.career_id %}selected{% endif %}>{{ c.career_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-warning" type="submit">Save Changes</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Professional Modal -->
+            <div class="modal fade" id="deleteProfessionalModal{{ p.professional_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5>Confirm Delete</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to delete <strong>{{ p.first_name }} {{ p.last_name }}</strong>?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="/delete_professional/{{ p.professional_id }}" class="btn btn-danger">Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Professional Modal -->
+<div class="modal fade" id="addProfessionalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('admin.add_professional') }}">
+            {{ add_professional_form.hidden_tag() }}
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Professional</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        {{ add_professional_form.first_name.label(class="form-label") }}
+                        {{ add_professional_form.first_name(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_professional_form.last_name.label(class="form-label") }}
+                        {{ add_professional_form.last_name(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_professional_form.email.label(class="form-label") }}
+                        {{ add_professional_form.email(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_professional_form.linkedin_id.label(class="form-label") }}
+                        {{ add_professional_form.linkedin_id(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_professional_form.career_id.label(class="form-label") }}
+                        {{ add_professional_form.career_id(class="form-select") }}
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Add Professional</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- COMMUNITY TAB -->
+<div id="communityTab" class="tab-section">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Communities</h2>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommunityModal">
+            Add Community
+        </button>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Community Name</th>
+                <th>Description</th>
+                <th>Career</th>
+                <th>Link</th>
+                <th style="width:180px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for com in communities %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ com.community_name }}</td>
+                <td>{{ com.description[:20] if com.description else '' }}...</td>
+                <td>{{ com.career.career_name if com.career else 'None' }}</td>
+                <td>
+                    {% if com.community_link %}
+                        <a href="{{ com.community_link }}" target="_blank">{{ com.community_link}}</a>
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editCommunityModal{{ com.community_id }}">
+                        Edit
+                    </button>
+
+                    <button class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteCommunityModal{{ com.community_id }}">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+            <!-- Edit Community Modal -->
+            <div class="modal fade" id="editCommunityModal{{ com.community_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <form method="POST" action="/edit_community/{{ com.community_id }}">
+                        <input type="hidden" name="csrf_token" value="{{ add_community_form.csrf_token._value() }}">
+
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5>Edit Community</h5>
+                                <button class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <label>Community Name</label>
+                                <input type="text" name="community_name"
+                                       class="form-control"
+                                       value="{{ com.community_name }}" required>
+
+                                <label class="mt-3">Description</label>
+                                <textarea name="description" class="form-control"
+                                          rows="3">{{ com.description }}</textarea>
+
+                                <label class="mt-3">Career</label>
+                                <select name="career_id" class="form-select">
+                                    {% for c in careers %}
+                                    <option value="{{ c.career_id }}"
+                                        {% if com.career and com.career.career_id == c.career_id %}selected{% endif %}>
+                                        {{ c.career_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+
+                                <label class="mt-3">Community Link</label>
+                                <input type="text" name="community_link"
+                                       class="form-control"
+                                       value="{{ com.community_link }}">
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                                <button class="btn btn-warning" type="submit">Save Changes</button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Community Modal -->
+            <div class="modal fade" id="deleteCommunityModal{{ com.community_id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5>Confirm Delete</h5>
+                            <button class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to delete
+                            <strong>{{ com.community_name }}</strong>?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="/delete_community/{{ com.community_id }}" class="btn btn-danger">Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+
+<!-- add community modal -->
+<div class="modal fade" id="addCommunityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('admin.add_community') }}">
+            {{ add_community_form.hidden_tag() }}
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Community</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        {{ add_community_form.community_name.label(class="form-label") }}
+                        {{ add_community_form.community_name(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_community_form.description.label(class="form-label") }}
+                        {{ add_community_form.description(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_community_form.career_id.label(class="form-label") }}
+                        {{ add_community_form.career_id(class="form-select") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ add_community_form.community_link.label(class="form-label") }}
+                        {{ add_community_form.community_link(class="form-control") }}
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="submit" class="btn btn-warning">Add Community</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+
+    const tabs = document.querySelectorAll("#adminTabs .nav-link");
+    const sections = document.querySelectorAll(".tab-section");
+
+    // Default – show skills tab
+    document.getElementById("skillsTab").classList.add("active");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", function () {
+            const target = this.getAttribute("data-tab");
+
+            // remove active from everything
+            tabs.forEach(t => t.classList.remove("active"));
+            sections.forEach(s => s.classList.remove("active"));
+
+            // activate clicked
+            this.classList.add("active");
+            document.getElementById(target).classList.add("active");
+        });
+    });
+});
+</script>
+{% endblock js %}

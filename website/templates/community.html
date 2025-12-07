@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<style>
+   .community-card {
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease-in-out;
+    }
+    .community-icon {
+        font-size: 2rem;
+        margin-right: 0.5rem;
+    }
+    .btn-join {
+        background-color: #f59e0b;
+        color: #fff;
+    }
+    .btn-join:hover {
+        background-color: #d97706;
+        color: #fff;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <!-- Search input -->
+    <div class="mt-3 mb-4">
+        <input 
+            type="text" 
+            id="communitySearch" 
+            class="form-control" 
+            placeholder="Search communities, descriptions, or anything..."
+        >
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Join a Community</h2>
+            <p>Connect with like-minded learners, professionals, and mentors. Choose any of the communities below to start engaging.</p>
+        </div>
+        <a href="{{ url_for('views.dashboard') }}" class="btn btn-warning">← Back to Dashboard</a>
+    </div>
+
+    <!-- Container for community cards -->
+    <div class="row" id="communityContainer">
+        {% for community in communities %}
+        <div class="col-md-6 col-lg-4">
+            <div class="community-card">
+                <div class="d-flex align-items-center mb-3">
+                   
+                    <h5 class="mb-0">{{ community.community_name }}</h5>
+                </div>
+                <p>{{ community.description }}</p>
+                <a href="{{ community.community_link }}" target="_blank" class="btn btn-join">Join {{ community.community_name }} →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Hidden template for restoring initial cards -->
+    <div id="initialCards" style="display: none;">
+        {% for community in communities %}
+        <div class="col-md-6 col-lg-4">
+            <div class="community-card">
+                <div class="d-flex align-items-center mb-3">
+                    
+                    <h5 class="mb-0">{{ community.community_name }}</h5>
+                </div>
+                <p>{{ community.description }}</p>
+                <a href="{{ community.community_link }}" target="_blank" class="btn btn-join">Join {{ community.community_name }} →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block js %}
+{{ super() }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    let debounceTimer;
+
+    $("#communitySearch").on("keyup", function () {
+        clearTimeout(debounceTimer);
+        let query = $(this).val().trim();
+
+        debounceTimer = setTimeout(function () {
+            const container = $("#communityContainer");
+
+            if (!query) {
+                // Restore initial cards if search is empty
+                container.html($("#initialCards").html());
+                return;
+            }
+
+            // AJAX request to search communities
+            $.ajax({
+                url: "{{ url_for('views.search_communities') }}",
+                method: "GET",
+                data: { q: query },
+                dataType: "json",
+                success: function(response) {
+                    container.empty();
+
+                    if (response.length === 0) {
+                        container.append('<p>No communities found.</p>');
+                        return;
+                    }
+
+                    response.forEach(function(c) {
+                        const card = `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="community-card">
+                                <div class="d-flex align-items-center mb-3">
+                                    <h5 class="mb-0">${c.community_name}</h5>
+                                </div>
+                                <p>${c.description}</p>
+                                <a href="${c.community_link}" target="_blank" class="btn btn-join">Join ${c.community_name} →</a>
+                            </div>
+                        </div>`;
+                        container.append(card);
+                    });
+                },
+                error: function() {
+                    console.error("Search failed");
+                }
+            });
+
+        }, 300); // debounce 300ms
+    });
+});
+</script>
+{% endblock js %}

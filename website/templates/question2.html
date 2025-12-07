@@ -1,0 +1,144 @@
+
+{% extends 'base.html' %}
+
+{% block title %}question2{% endblock title %}
+
+{% block style %}
+{{ super() }}
+   <style>
+    /* Center Content */
+    .content-wrapper {
+      min-height: calc(100vh - 64px);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      background: #fff;
+    }
+
+    .subtext {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Option Buttons */
+    .option-btn {
+    border: 1px solid #d1d5db;
+    background-color: #fff;
+    color: #374151;
+    border-radius: 50px;
+    padding: 10px 24px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    width: 100%;
+    }
+
+    .option-btn:hover,
+    .option-btn.active {
+    background-color: #f59e0b;
+    color: #fff;
+    border-color: #f59e0b;
+    }
+/* 
+    .btn-skip {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-skip:hover {
+      background: #e5e7eb;
+    } */
+
+    .btn-amber {
+      background-color: #f59e0b;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-amber:hover {
+      background-color: #d97706;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+   </style>
+{% endblock style %}
+
+
+
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="card text-center">
+    <h4 class="fw-bold mb-2 text-dark">What is your education level?</h4>
+    <p class="subtext">e.g  I want to start a business, achieving financial independence through your career</p>
+
+    <form method="POST">
+      {{ form.csrf_token }}
+
+      <input type="hidden" id="currentlevel" name="currentlevel">
+
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <button type="button" class="option-btn">Secondary</button>
+        </div>
+        <div class="col-6">
+          <button type="button" class="option-btn">Diploma</button>
+        </div>
+        <div class="col-6">
+          <button type="button" class="option-btn">BSc</button>
+        </div>
+        <div class="col-6">
+          <button type="button" class="option-btn">MSc</button>
+        </div>
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" class="btn btn-amber px-4 py-2">Next</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+{{ super() }}
+<script>
+  const buttons = document.querySelectorAll(".option-btn");
+  const hiddenInput = document.getElementById("currentlevel");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", function () {
+      // remove 'active' class from all
+      buttons.forEach(b => b.classList.remove("active"));
+      // add to clicked
+      this.classList.add("active");
+      // update hidden input value
+      hiddenInput.value = this.textContent.trim();
+    });
+  });
+</script>
+{% endblock js %}

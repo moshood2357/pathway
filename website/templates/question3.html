@@ -1,0 +1,99 @@
+
+{% extends 'base.html' %}
+
+{% block title %}question 3{% endblock title %}
+
+{% block style %}
+{{ super() }}
+    <style>
+    /* Centered Content Wrapper */
+    .content-wrapper {
+      min-height: calc(100vh - 64px);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      background: #fff;
+    }
+
+    .subtext {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .btn-skip {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-skip:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-amber {
+      background-color: #f59e0b;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-amber:hover {
+      background-color: #d97706;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+</style>
+{% endblock style %}
+
+
+
+
+{% block content %}
+   
+  <!-- Centered Card -->
+  <div class="content-wrapper">
+    <div class="card text-center">
+      <h4 class="fw-bold mb-3 text-dark">Do you have a career goal?</h4>
+      <p class="subtext">
+        If no goal in mind, don't worry — we will help you <a href = "https://www.16personalities.com/free-personality-test">discover</a> one.<br>
+        If you have, click next.
+      </p>
+
+      <div class="btn-container">
+        <a href = "{{ url_for('views.Fifth_question')}}" type="button" class="btn btn-skip px-4 py-2">Skip</a>
+        <a href="{{ url_for('views.Fourth_question')}}" class="btn btn-amber px-4 py-2">Next</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="bootstrap/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>
+
+{% endblock content %}

@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Professionals{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<style>
+    .professional-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .professional-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .professional-name {
+        font-weight: 600;
+        color: #343a40;
+    }
+
+    .professional-info li {
+        margin-bottom: 5px;
+    }
+
+    .professional-info a {
+        text-decoration: none;
+        color: #0d6efd;
+    }
+
+    .professional-info a:hover {
+        text-decoration: underline;
+    }
+
+    .cards-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    h1 {
+        color: #343a40;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="content-wrapper container py-4">
+    <h1 class="text-center">List of Professionals</h1>
+    {% if pro %}
+    <div class="cards-wrapper">
+        {% for p in pro %}
+        <div class="professional-card bg-white">
+            <h3 class="professional-name mb-2">{{ p.first_name }} {{ p.last_name }}</h3>
+            <ul class="professional-info list-unstyled mb-0">
+                <li><strong>Email:</strong> {{ p.email }}</li>
+                <li><strong>LinkedIn:</strong> 
+                    {% if p.linkedin_id %}
+                        <a href="{{ p.linkedin_id }}" target="_blank">{{ p.linkedin_id }}</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </li>
+                <li><strong>Expertise:</strong> {{ p.career.career_name }}</li>
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-center text-muted mt-4">No professionals found.</p>
+    {% endif %}
+</div>
+{% endblock content %}

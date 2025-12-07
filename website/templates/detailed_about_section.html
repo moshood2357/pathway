@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<style>
+  .content-wrapper{
+    min-height:calc(100vh - 64px);
+    background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    padding: 4rem 2rem;
+  }
+
+  .about-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .about-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .about-section img {
+    border-radius: 1rem;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .about-section h3 {
+    color: #1e3a5f;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .about-section p {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  .about-section ul {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    color: #374151;
+  }
+
+  .about-section ul li {
+    margin-bottom: 0.5rem;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .col-md-6 {
+    flex: 1 1 45%;
+  }
+
+  @media(max-width: 768px) {
+    .row {
+      flex-direction: column;
+    }
+
+    .col-md-6 {
+      flex: 1 1 100%;
+    }
+  }
+
+  .cta-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: #f59e0b;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background 0.3s ease;
+    margin-top: 2rem;
+  }
+
+  .cta-button:hover {
+    background-color: #d97706;
+  }
+
+  .feature-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+  }
+
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="content-wrapper">
+    <section class="about-section" id="about">
+        <h2 class="about-title">About Us</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <img src="/static/images/path-about.png" alt="Pathway Career Development">
+            </div>
+            <div class="col-md-6">
+                <p>
+                    At <strong>Pathway</strong>, we empower students and professionals at all stages of their career journey. Our mission is to provide clarity, guidance, and actionable tools so that you can reach your goals faster, with confidence and purpose. Too often, talented individuals know what they want, but not how to get there. That’s where Pathway comes in.
+                </p>
+                <p>
+                    <strong>Pathway is a human-powered career development platform</strong> that combines expert insights, tailored learning paths, and actionable career steps to help you grow strategically. Whether you’re looking to switch industries, get promoted, or land a dream role, Pathway provides the roadmap.
+                </p>
+            </div>
+        </div>
+
+        <!-- Mission & Vision -->
+        <h3>Our Mission</h3>
+        <p>To make career growth accessible, actionable, and measurable for every professional. We aim to bridge the gap between ambition and achievement by providing a personalized, human-centered approach to career development.</p>
+
+        <h3>Our Vision</h3>
+        <p>To become the world’s most trusted career development platform, helping millions of people achieve meaningful and fulfilling careers globally.</p>
+
+        <!-- How It Works -->
+        <h3>How Pathway Works</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h4>1. Assess Your Skills</h4>
+                    <p>We analyze your current skills, experience, and career goals to identify areas of growth and opportunity.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h4>2. Personalized Roadmap</h4>
+                    <p>Receive a clear career path with recommended roles, learning resources, and milestones tailored to your ambitions.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h4>3. Track Progress</h4>
+                    <p>Monitor your readiness for each step and track your growth so you know exactly what to focus on next.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card">
+                    <h4>4. Expert Guidance</h4>
+                    <p>Access mentorship and actionable insights from experienced professionals to navigate challenges and seize opportunities.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why Choose Pathway -->
+        <h3>Why Choose Pathway?</h3>
+        <ul>
+            <li>Comprehensive skill assessments and career analytics.</li>
+            <li>Actionable, personalized career roadmaps.</li>
+            <li>Guided learning paths aligned with industry needs.</li>
+            <li>Support from a community of professionals and mentors.</li>
+            <li>Trackable milestones to ensure continuous growth.</li>
+        </ul>
+
+        <p>
+            Pathway isn’t just a platform; it’s a partner in your career journey. We help you move from uncertainty to clarity, from potential to achievement.
+        </p>
+
+        <!-- Call to Action -->
+        <div class="text-center">
+            <a href="{{ url_for('auth.Sign_up')}}" class="cta-button">Start Your Career Journey Today</a>
+        </div>
+
+    </section>
+</div>
+{% endblock content %}

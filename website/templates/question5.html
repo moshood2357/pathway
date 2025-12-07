@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block style %}
+{{ super() }}
+<style>
+  .wrapper {
+    min-height: calc(100vh - 64px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .content-wrapper{
+    border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      background: #fff;
+  }
+
+  .strength-btn {
+    border: 1px solid #d1d5db;
+    background-color: #fff;
+    color: #374151;
+    border-radius: 50px;
+    padding: 10px 24px;
+    transition: all 0.3s ease;
+    font-size: 15px;
+    width: 100%;
+  }
+
+  .strength-btn:hover {
+    border-color: #9ca3af;
+  }
+
+  .strength-btn.active {
+    background-color: #f59e0b;
+    color: #fff;
+    border-color: #f59e0b;
+  }
+
+  .finish-btn {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+  }
+
+  .finish-btn:hover {
+    background-color: #d97706;
+  }
+</style>
+{% endblock style %}
+
+{% block content %}
+<div class="wrapper">
+    <div class="content-wrapper text-center" style="max-width: 900px;">
+  <h1 class="fw-bold text-dark mb-3">What are your career strengths?</h1>
+  <p class="text-muted mb-5">Unsure of your strengths? You are free to skip.</p>
+
+  <div class="row g-3 justify-content-center mb-5">
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Leadership</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Python</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Machine learning</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Project management</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Communication</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Java</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Data analysis</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Problem solving</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Interpersonal relationship</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Writing</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Reading</button></div>
+    <div class="col-6 col-md-4 col-lg-3"><button class="strength-btn">Others</button></div>
+  </div>
+
+  <form id="strengthForm" method="POST" action="{{ url_for('views.save_strengths') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="strengths" id="selectedStrengths">
+  <div class="text-end">
+    <button type="submit" class="finish-btn">Finish</button>
+  </div>
+</form>
+
+</div>
+</div>
+{% endblock content %}
+
+{% block js %}
+{{ super() }}
+<script>
+  var buttons = document.getElementsByClassName("strength-btn");
+  var selected = [];
+
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+    });
+  }
+
+  // On form submit, collect selected strengths
+  document.getElementById("strengthForm").addEventListener("submit", function (e) {
+    let selectedStrengths = [];
+    document.querySelectorAll(".strength-btn.active").forEach(btn => {
+      selectedStrengths.push(btn.textContent.trim());
+    });
+    document.getElementById("selectedStrengths").value = selectedStrengths.join(",");
+  });
+</script>
+
+{% endblock js %}

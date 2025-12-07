@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 750px;">
+
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Update Your Profile</h2>
+        <p class="text-muted">Improve your career recommendations by updating your strengths and goals.</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Card Wrapper -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <!-- Career Goal -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Career Goal</label>
+                    <textarea name="career_goal" rows="3" class="form-control"
+                        placeholder="e.g. Become a Product Designer or Software Engineer">{{ user.career_goal }}</textarea>
+                    <div class="form-text">Describe the type of role or industry you want to grow into.</div>
+                </div>
+
+                <!-- Strengths -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Your Strengths</label>
+                    <textarea name="strength" rows="3" class="form-control"
+                        placeholder="e.g. problem solving, leadership, creativity">{{ user.strength }}</textarea>
+                    <div class="form-text">List your natural strengths. This improves recommendation accuracy.</div>
+                </div>
+
+                <!-- Education Level -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Education Level</label>
+                    <input type="text" name="education_level" class="form-control"
+                        value="{{ user.education_level }}"
+                        placeholder="e.g. BSc, HND, OND, MSc, etc">
+                </div>
+
+                <!-- Skills -->
+                <!-- <div class="mb-3">
+                    <label class="form-label fw-semibold">Skills (Optional)</label>
+                    <input type="text" name="skills" class="form-control"
+                        value="{{ user.skills }}"
+                        placeholder="e.g. UI/UX, Python, Writing, Data Entry">
+                    <div class="form-text">Separate multiple skills with commas.</div>
+                </div> -->
+
+                <!-- Submit Button -->
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('views.dashboard') }}" class="text-decoration-none">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+</div>
+{% endblock %}

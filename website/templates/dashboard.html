@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f6fc;
+    }
+    .sidebar {
+      background-color: #0f172a;
+      color: white;
+      min-height: 100vh;
+      transition: all 0.3s ease;
+    }
+    .sidebar.collapsed {
+      width: 80px !important;
+    }
+    .sidebar.expanded {
+      width: 250px !important;
+    }
+    .sidebar .nav-link {
+      color: #cbd5e1;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s;
+    }
+    .sidebar .nav-link:hover {
+      background-color: #1e293b;
+      color: white;
+    }
+    .sidebar .nav-link.active {
+      background-color: #fbbf24;
+      color: #0f172a;
+    }
+    .skill-bar {
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .skill-progress {
+      height: 8px;
+      background-color: #0f172a;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container position-fixed top-0 translate-middle-x mt-3" style="left: 65%; z-index: 1050; width: auto; max-width: 480px;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow mb-2" role="alert">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small">{{ message }}</span>
+            <button type="button" class="btn-close btn-close-white btn-sm bg-primary-subtle rounded-4" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar expanded p-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div id="logo" class="d-flex align-items-center gap-2"></div>
+      <button id="toggleSidebar" class="btn btn-sm text-white">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+    </div>
+
+    <nav class="nav flex-column gap-1">
+      <a href="#" class="nav-link active"><i class="bi bi-grid-3x3-gap me-2"></i> <span class="label">Dashboard</span></a>
+      <a href="#" class="nav-link"><i class="bi bi-graph-up me-2"></i> <span class="label">Courses</span></a> 
+      <a href="#" class="nav-link"><i class="bi bi-bar-chart-fill me-2"></i> <span class="label">Progress</span></a>
+      <a href="{{ url_for('views.community') }}" class="nav-link"><i class="bi bi-people-fill me-2"></i> <span class="label">Community</span></a>
+      <a href="https://www.16personalities.com/free-personality-test" target="_blank" class="nav-link">
+        <i class="bi bi-lightbulb me-2"></i>
+
+        <span class="label">Personality Test</span>
+      </a>
+      <a href="{{ url_for('views.update_profile') }}" class="nav-link">
+        <i class="bi bi-person-gear me-2"></i> <span class="label">Update Profile</span>
+      </a>
+      <a href="#" class="nav-link"><i class="bi bi-gear me-2"></i> <span class="label">Settings</span></a>
+       <a href="{{ url_for('auth.logout') }}" class="nav-link">
+        <i class="bi bi-person-gear me-2"></i> <span class="label">logout</span>
+      </a>
+    </nav>
+   
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-grow-1 p-4">
+    <div class="mb-4 d-flex justify-content-between align-items-start">
+      <div>
+        <h2 class="fw-bold text-dark mb-3">Welcome, {{ user.full_name }}</h2>
+        <div class="gap-3 d-flex">
+          <a href="#" class="btn btn-warning text-white fw-semibold">Explore courses</a>
+          <a href="{{ url_for('views.professional') }}" class="btn btn-outline-warning text-black-50 fw-semibold">See professionals</a>
+        </div>
+      </div>
+      <div>
+        <a href="{{ url_for('views.update_profile') }}" class="btn btn-primary fw-semibold shadow-sm">
+          <i class="bi bi-person-gear me-1"></i> Update Profile
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left Column -->
+      <div class="col-lg-8">
+        <!-- Career Goal -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <small class="text-muted">Career Goal</small>
+              <i class="bi bi-pencil-square text-secondary" id="editGoalBtn" style="cursor:pointer"></i>
+            </div>
+            <div id="goalDisplay">
+              <h4 class="fw-bold text-dark" id="careerGoal">{{ recommended_career }}</h4>
+            </div>
+            <div id="goalEdit" class="d-none">
+              <div class="input-group">
+                <input type="text" id="goalInput" class="form-control" />
+                <button class="btn btn-success" id="saveGoalBtn">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills Progress -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold text-dark mb-3">Skills Progress</h5>
+            <div id="skillsProgress"></div>
+          </div>
+        </div>
+
+        <!-- Recommended Courses -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold text-dark mb-3">Recommended Courses</h5>
+            <div id="coursesList"></div>
+          </div>
+        </div>
+
+        <!-- Progress Readiness -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold text-dark mb-1">Progress Readiness</h5>
+            <p class="text-muted mb-3">Preparedness for the next role</p>
+            <div class="d-flex align-items-center gap-3">
+              <div class="progress flex-grow-1" style="height: 10px;">
+                <div id="readinessBar" class="progress-bar bg-success" style="width: 0%"></div>
+              </div>
+              <span id="readinessValue" class="fw-bold fs-5">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-lg-4">
+        <!-- Skills To Learn -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <h5 class="fw-bold text-dark mb-3">Skills to Learn</h5>
+            <ul class="list-unstyled mb-3" id="skillsList"></ul>
+            <form id="addSkillForm" class="d-flex gap-2">
+              <input type="text" id="newSkill" class="form-control form-control-sm" placeholder="Add a new skill" required>
+              <button class="btn btn-warning btn-sm text-white">Add</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- AI CV Assistant -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h5 class="fw-bold text-dark mb-2">AI CV Assistant</h5>
+            <h6 class="fw-semibold text-secondary mb-2">Personalised Suggestion</h6>
+            <p class="text-muted small mb-0">Include relevant metrics to highlight achievements.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Sidebar toggle
+  const sidebar = document.getElementById("sidebar");
+  const toggleSidebar = document.getElementById("toggleSidebar");
+  const labels = document.querySelectorAll(".sidebar .label");
+
+  toggleSidebar.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+    sidebar.classList.toggle("expanded");
+    labels.forEach(label => label.classList.toggle("d-none"));
+  });
+
+  // Skills progress
+  const skillsData = [
+    { name: "Python", progress: 40 },
+    { name: "Data Analysis", progress: 20 },
+    { name: "Statistics", progress: 0 },
+    { name: "SQL", progress: 0 },
+    { name: "Machine L.", progress: 0 },
+  ];
+  const skillsProgressContainer = document.getElementById("skillsProgress");
+  skillsData.forEach(skill => {
+    const skillDiv = document.createElement("div");
+    skillDiv.className = "mb-3";
+    skillDiv.innerHTML = `
+      <div class="d-flex justify-content-between mb-1">
+        <span class="text-muted small">${skill.name}</span>
+        <span class="small">${skill.progress}%</span>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-progress" style="width: ${skill.progress}%;"></div>
+      </div>`;
+    skillsProgressContainer.appendChild(skillDiv);
+  });
+
+  // Recommended courses
+  const courses = [
+    { title: "Machine Learning" },
+    { title: "Python for Data Science" },
+    { title: "Data Visualization" },
+  ];
+  const coursesList = document.getElementById("coursesList");
+  courses.forEach(course => {
+    const div = document.createElement("div");
+    div.className = "d-flex align-items-center justify-content-between border rounded p-3 mb-2";
+    div.innerHTML = `
+      <div class="d-flex align-items-center gap-3">
+        <div class="bg-light rounded" style="width:80px; height:50px;"></div>
+        <div>
+          <h6 class="mb-0">${course.title}</h6>
+        </div>
+      </div>
+      <button class="btn btn-warning btn-sm text-white">Start</button>`;
+    coursesList.appendChild(div);
+  });
+
+  // Skills to learn
+  let skillsToLearn = [
+    "Statistical analysis and evaluation",
+    "Machine learning",
+    "Model evaluation",
+    "DevOps and CI/CD",
+    "Cloud platforms",
+    "Version control",
+    "Communication",
+    "Problem Solving",
+  ];
+  const skillsList = document.getElementById("skillsList");
+
+  function renderSkills() {
+    skillsList.innerHTML = "";
+    skillsToLearn.forEach((skill, index) => {
+      const li = document.createElement("li");
+      li.className = "d-flex justify-content-between align-items-center mb-2";
+      li.innerHTML = `
+        <span class="text-muted small">${skill}</span>
+        <button class="btn btn-sm btn-outline-danger btn-remove" data-index="${index}">Remove</button>`;
+      skillsList.appendChild(li);
+    });
+    document.querySelectorAll(".btn-remove").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const index = e.target.dataset.index;
+        skillsToLearn.splice(index, 1);
+        renderSkills();
+      });
+    });
+  }
+  renderSkills();
+
+  document.getElementById("addSkillForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newSkill = document.getElementById("newSkill").value.trim();
+    if (newSkill && !skillsToLearn.includes(newSkill)) {
+      skillsToLearn.push(newSkill);
+      renderSkills();
+    }
+    e.target.reset();
+  });
+
+  // Career goal edit
+  const editBtn = document.getElementById("editGoalBtn");
+  const saveBtn = document.getElementById("saveGoalBtn");
+  const goalDisplay = document.getElementById("goalDisplay");
+  const goalEdit = document.getElementById("goalEdit");
+  const goalInput = document.getElementById("goalInput");
+  const careerGoal = document.getElementById("careerGoal");
+
+  editBtn.addEventListener("click", () => {
+    goalInput.value = careerGoal.textContent;
+    goalDisplay.classList.add("d-none");
+    goalEdit.classList.remove("d-none");
+  });
+
+  saveBtn.addEventListener("click", () => {
+    const newGoal = goalInput.value.trim();
+    if (newGoal) careerGoal.textContent = newGoal;
+    goalDisplay.classList.remove("d-none");
+    goalEdit.classList.add("d-none");
+  });
+
+  // Progress readiness
+  let readiness = 0;
+  const readinessBar = document.getElementById("readinessBar");
+  const readinessValue = document.getElementById("readinessValue");
+
+  const progressInterval = setInterval(() => {
+    if (readiness >= 60) clearInterval(progressInterval);
+    else {
+      readiness += 10;
+      readinessBar.style.width = readiness + "%";
+      readinessValue.textContent = readiness + "%";
+    }
+  }, 500);
+</script>
+</body>
+</html>

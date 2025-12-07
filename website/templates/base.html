@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+    <title>{% block title %}{% endblock %}</title>
+
+
+    {% block style %}
+         <style>
+
+        .navbar-custom {
+        background-color: #1e3a5f;
+        /* color:white; */
+        padding: 2rem ;
+        height: 80px;
+    }
+
+    .navbar-brand img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .navbar-nav .nav-link {
+        color: white !important;
+        margin-right: 1.5rem;
+        font-weight: 500;
+    }
+
+        .btn-login {
+        background-color: orange;
+        border: none;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+
+    .btn-outline-amber{
+        background-color: none;
+        border: 2px solid orange;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        margin-left: 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    
+    .btn-outline-amber:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+    .btn-login:hover,
+    .btn-orange:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+
+    .footer-custom {
+        background-color: #1e3a5f;
+        padding: 2rem 0;
+        color: white;
+    }
+
+    .footer-nav .nav-link {
+        color: white !important;
+        margin-right: 2rem;
+    }
+
+
+    </style>
+    {% endblock %}
+</head>
+<body>
+     <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('views.home')}}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pathway Logo">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse py-3" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if session.get('user_id') == None %}
+                      <li class="nav-item">
+                        <a class="btn btn-login" href="{{ url_for('auth.Sign_in')}}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-amber px-3" href="{{ url_for('auth.Sign_up')}}">Sign up</a>
+                    </li>
+                    
+                    {% else %}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('views.about') }}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('views.contact')}}">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a  class="btn btn-outline-amber" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                    
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+        
+    
+    
+    <!-- main content -->
+        {% block content %}
+        {% endblock %}
+    
+     
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row flex flex-column justify-content-center align-items-center">
+                <div class="col-md-4">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" style = "height: 40px;" alt=" Pathway Logo "class="me-3">
+                </div>
+                <div class="col-md-4">
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link footer-nav" href="{{ url_for('views.home') }}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link footer-nav" href="{{ url_for('views.about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link footer-nav" href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-0">All right reserved</p>
+                </div>
+            </div>
+            
+            
+        </div>
+    </footer>
+</body>
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/jquery/index.js') }}"></script> -->
+
+  {% block customjs %}
+  {% endblock customjs %}
+
+
+     {% block js %}
+     
+     {% endblock js%}
+</html>

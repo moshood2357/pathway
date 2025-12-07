@@ -1,0 +1,141 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock title %}
+
+{% block style %}
+{{ super() }}
+   <style>
+       
+    .content-wrapper{
+      min-height:calc(100vh - 64px) ;
+      background-color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Navbar */
+    .navbar-custom {
+      background-color: #1e3a5f;
+      padding: 1rem 0;
+      z-index: 1030;
+      height: 80px;
+    }
+
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .navbar-nav .nav-link {
+      color: gray !important;
+      margin-right: 1.5rem;
+      font-weight: 500;
+    }
+
+    /* Centered Content Wrapper */
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Card Styling */
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 20px;
+    }
+
+    .subtext {
+      color: #6b7280;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    /* Buttons */
+    .btn-skip {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-skip:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-amber {
+      background-color: #f59e0b;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-amber:hover {
+      background-color: #d97706;
+      color: #fff;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+   </style>
+{% endblock style %}
+
+
+
+
+{% block content %}
+   
+ <!-- Centered Card -->
+  <div class="content-wrapper">
+    <div class="card text-center">
+      <!-- <img src="logo.png" alt="Logo" class="logo" /> -->
+      <h4 class="fw-bold mb-2 text-dark">What is your current role?</h4>
+      <p class="subtext">If no current role, you can skip</p>
+
+     <form method="post">
+    {{ form.csrf_token }}
+    
+    <div class="mb-4">
+        {{ form.currentrole(class_="form-control fw-semibold", placeholder="Enter your current role") }}
+        {% for error in form.currentrole.errors %}
+            <span class="text-danger">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="btn-container">
+        {{ form.submit(class_="btn btn-amber px-4 py-2") }}
+    </div>
+</form>
+
+    </div>
+  </div>
+
+{% endblock content %}

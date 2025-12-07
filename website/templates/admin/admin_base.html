@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+    <title>{% block title %}{% endblock %}</title>
+
+
+    {% block style %}
+         <style>
+
+        .navbar-custom {
+        background-color: #1e3a5f;
+        /* color:white; */
+        padding: 2rem ;
+        height: 80px;
+    }
+
+    .navbar-brand img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .navbar-nav .nav-link {
+        color: white !important;
+        margin-right: 1.5rem;
+        font-weight: 500;
+    }
+
+        .btn-login {
+        background-color: orange;
+        border: none;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+
+    .btn-outline-amber{
+        background-color: none;
+        border: 2px solid orange;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        margin-left: 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    
+    .btn-outline-amber:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+    .btn-login:hover,
+    .btn-orange:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+
+    .footer-custom {
+        background-color: #1e3a5f;
+        padding: 2rem 0;
+        color: white;
+    }
+
+    .footer-nav .nav-link {
+        color: white !important;
+        margin-right: 2rem;
+    }
+
+
+    </style>
+    {% endblock %}
+</head>
+<body>
+     <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pathway Logo">
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse py-3" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a  class="btn btn-outline-amber" href="{{ url_for('admin.admin_logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+        
+    
+    
+    <!-- main content -->
+        {% block content %}
+        {% endblock %}
+    
+     
+    <!-- Footer -->
+    
+</body>
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/jquery/index.js') }}"></script> -->
+
+  {% block customjs %}
+  {% endblock customjs %}
+
+
+     {% block js %}
+     
+     {% endblock js%}
+</html>

@@ -1,0 +1,89 @@
+
+{% extends 'base.html' %}
+
+{% block title %}OTP{% endblock title %}
+
+{% block style %}   
+{{ super() }}
+    <style>
+    /* body {
+     
+      background-color: #f5f6fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    } */
+    .wrapper {
+      min-height: calc(100vh - 64px);
+      background-color: #fff;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* border-radius: 10px; */
+      /* box-shadow: 0 4px 12px rgba(0,0,0,0.08); */
+      /* text-align: center; */
+    }
+
+    .card-custom{
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 2rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      background: #fff;
+    }
+    .btn-amber {
+      background-color: #f59e0b;
+      color: #fff;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    .btn-amber:hover {
+      background-color: #d97706;
+    }
+  </style>
+{% endblock style %}
+
+
+
+
+{% block content %}
+   
+ <!-- Centered Card -->
+ <div class="wrapper">
+    <div class="card-custom">
+    <h1 class="fw-bold text-dark mb-3">Now, you're good to go</h1>
+    <p class="text-muted mb-4">Enter the OTP sent to your email</p>
+     {% set feedback = get_flashed_messages(with_categories=True) %}
+            {% for cat,message in feedback %}
+                {% if cat == 'msg' %}
+                    <div class="alert alert-success">
+                        <p>{{ message }}</p>
+                    </div>
+                {% elif cat=='errormsg'%}
+                    <div class="alert alert-danger">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+    <form method="POST">
+      {{ form.csrf_token}}
+      <div class="mb-3 text-start">
+        {{ form.email.label(class_= "form-label fw-semibold")}}
+        {{ form.email(class_= "form-control")}}
+        {%  for error in form.email.errors %}
+            <span class="text-danger">{{ error}}</span>
+        {% endfor %}
+      </div>
+
+      {{ form.submit(class_="btn btn-amber w-100 py-3") }}
+    </form>
+  </div>
+ </div>
+
+
+{% endblock content %}

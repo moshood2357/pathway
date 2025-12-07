@@ -1,0 +1,204 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block style %}
+{{ super() }}
+    <style>
+        .signin-container {
+        min-height: calc(100vh - 64px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+        .signin-box {
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+        }
+        .form-control {
+        padding: 14px;
+        border-radius: 8px;
+        }
+        .btn-warning {
+        background-color: rgb(255, 165, 0);
+        border: none;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 8px;
+        }
+        .btn-warning:hover {
+        background-color: rgb(255, 165, 50);
+        }
+        .forgot-link {
+        font-size: 0.9rem;
+        text-align: right;
+        margin-top: 5px;
+        }
+         
+        /* .navbar-custom {
+        background-color: #1e3a5f;
+        padding: 1rem 0;
+        height: 80px;
+    }
+
+    .navbar-brand img {
+        width: 40px;
+        height: 40px;
+    }
+
+    .navbar-nav .nav-link {
+        color: gray !important;
+        margin-right: 1.5rem;
+        font-weight: 500;
+    } */
+
+    /* .btn-login {
+        background-color: orange;
+        border: none;
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+
+    .btn-login:hover,
+    .btn-orange:hover {
+        background-color: rgb(255, 165, 50);
+    }
+
+    .btn-orange {
+        background-color: orange;
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+    } */
+
+    /* .hero-section {
+        background-color: #f8f9fa;
+        padding: 5rem 0;
+        min-height: 70vh;
+    }
+        .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-text {
+        font-size: 1.1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .hero-illustration {
+        width: 100%;
+        max-width: 400px;
+        height: 300px;
+        
+        background-size: contain;
+    }
+
+    .about-section {
+        padding: 5rem 0;
+        background-color: white;
+    }
+
+    .about-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 3rem;
+        text-decoration: underline;
+    }
+
+    
+    .contact-section {
+        padding: 5rem 0;
+    }
+
+    .contact-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 3rem;
+        text-decoration: underline;
+    } */
+
+  
+
+    /*.footer-custom {
+        background-color: #1e3a5f;
+        padding: 2rem 0;
+        color: white;
+    }
+
+    .footer-nav .nav-link {
+        color: white !important;
+        margin-right: 2rem;
+    } */
+    
+</style>
+{% endblock style %}
+
+
+
+
+{% block content %}
+   <!-- Sign In Form -->
+            <div class="signin-container">
+                <div class="signin-box">
+                    <h3 class="fw-bold mb-4">Sign in to your account</h3>
+                     {% set feedback = get_flashed_messages(with_categories=True) %}
+                            {% for cat,message in feedback %}
+                                {% if cat == 'success' %}
+                                    <div class="alert alert-success">
+                                        <p>{{ message }}</p>
+                                    </div>
+                                {% elif cat=='error'%}
+                                    <div class="alert alert-danger">
+                                        <p>{{ message }}</p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                    
+                    <form method="POST">
+                        {{ form.csrf_token}}
+                        <div class="mb-3 text-start">
+                            {{ form.email.label(class_= "form-label fw-semibold")}}
+                            {{ form.email(class_= "form-control")}}
+                             {%  for error in form.email.errors %}
+                                <span class="text-danger">{{ error}}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3 text-start">
+                            {{ form.password.label(class_= "form-label fw-semibold")}}
+                            {{ form.password(class_= "form-control")}}
+                             {%  for error in form.password.errors %}
+                                <span class="text-danger">{{ error}}</span>
+                            {% endfor %}
+                        </div>
+                       
+                        {{ form.submit(class_="btn btn-warning fw-semibold text-white shadow-sm mb-3 w-100") }}
+
+<!-- 
+                        <div class="form-check mb-3">
+                            {{ form.remember(class_="form-check-input") }}
+                            {{ form.remember.label(class_="form-check-label text-start") }}
+                        </div> -->
+                        
+                    </form>
+
+                </div>
+        </div>
+
+{% endblock content %}
+
