@@ -109,7 +109,18 @@
             <main class="wrap">
         <section class="card-area">
             <h1 id="signupTitle">Sign up for an account</h1>
-            
+             {% set feedback = get_flashed_messages(with_categories=True) %}
+                            {% for cat,message in feedback %}
+                                {% if cat == 'msg' %}
+                                    <div class="alert alert-success">
+                                        <p>{{ message }}</p>
+                                    </div>
+                                {% elif cat=='errormsg'%}
+                                    <div class="alert alert-danger">
+                                        <p>{{ message }}</p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}      
             <form class="mx-auto" style="max-width:420px;" method="post">
                 {{ form.csrf_token}}
                 <div class="mb-3 text-start">

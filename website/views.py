@@ -196,6 +196,7 @@ def dashboard():
     )
 
 
+
 @views.route("/professional")
 def professional():
     pro = Professional.query.all()
@@ -214,6 +215,7 @@ def update_profile():
     user = User.query.get(user_id)
 
     if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
         career_goal = request.form.get("career_goal", "").strip()
         strength = request.form.get("strength", "").strip()
         education_level = request.form.get("education_level", "").strip()
@@ -225,11 +227,12 @@ def update_profile():
             return redirect(url_for("views.update_profile"))
 
         # --- Update user fields ---
+        user.full_name = full_name or user.full_name
         user.career_goal = career_goal or user.career_goal
         user.strength = strength or user.strength
         user.education_level = education_level or user.education_level
 
-        # Save optional skills if your User model supports it
+
         if hasattr(user, "skills"):
             user.skills = skills or user.skills
 
@@ -243,6 +246,7 @@ def update_profile():
         "update_profile.html",
         user=user
     )
+
 
 
 

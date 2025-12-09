@@ -35,6 +35,7 @@ def after_request(response):
 
 @auth.route("/sign-in", methods=['GET', 'POST'])
 def Sign_in():
+
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -61,6 +62,10 @@ def Sign_in():
 
 @auth.route("/sign-up", methods=['GET', 'POST'])
 def Sign_up():
+    # Redirect logged-in users away from signup
+    if session.get('user_id'):
+        return redirect(url_for('views.dashboard'))
+
     form = RegistrationForm()
 
     if form.validate_on_submit():  
@@ -77,8 +82,6 @@ def Sign_up():
             db.session.commit()
             
             session['user_id'] = u.user_id
-
-            # flash('An account has been created for you, please login', category='msg')
             return redirect(url_for('views.Second_question'))
         except:
             db.session.rollback()
@@ -86,7 +89,6 @@ def Sign_up():
             return redirect(url_for('auth.Sign_up'))
 
     return render_template('signup.html', form=form)
-
     
 
 

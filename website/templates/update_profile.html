@@ -28,6 +28,14 @@
 
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Full name -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Name</label>
+                    <input name="full_name" class="form-control" placeholder="e.g. Become a Product Designer or Software Engineer" value="{{ user.full_name }}">
+                    <div class="form-text">Edit your name</div>
+                </div>
+
                 <!-- Career Goal -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Career Goal</label>
