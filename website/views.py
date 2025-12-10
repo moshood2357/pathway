@@ -197,14 +197,6 @@ def dashboard():
 
 
 
-@views.route("/professional")
-def professional():
-    pro = Professional.query.all()
-    return render_template("professional.html", pro=pro)
-
-
-
-
 @views.route('/profile/update', methods=['GET', 'POST'])
 @login_required
 def update_profile():
@@ -248,13 +240,12 @@ def update_profile():
     )
 
 
-
+# community and search route
 
 @views.route("/community")
 def community():
     communities=Community.query.limit(24).all()
     return render_template("community.html", communities=communities)
-
 
 
 
@@ -281,3 +272,43 @@ def search_communities():
     ]
     
     return jsonify(communities)
+
+
+
+
+# professional and search professional route
+@views.route("/professional")
+def professional():
+    pro = Professional.query.all()
+    return render_template("professional.html", pro=pro)
+
+@views.route('/search_professionals')
+def search_professionals():
+    query = request.args.get('q', '').strip()
+    
+    if not query:
+        return jsonify([])
+
+    # Join Career so we can search by career name
+    results = Professional.query.join(Career).filter(
+        db.or_(
+            Professional.first_name.ilike(f'%{query}%'),
+            Professional.last_name.ilike(f'%{query}%'),
+            Professional.email.ilike(f'%{query}%'),
+            Professional.linkedin_id.ilike(f'%{query}%'),
+            Career.career_name.ilike(f'%{query}%')
+        )
+    ).all()
+
+    professionals = [
+        {
+            'first_name': p.first_name,
+            'last_name': p.last_name,
+            'email': p.email,
+            'linkedin_id': p.linkedin_id,
+            'career': p.career.career_name if p.career else None
+        }
+        for p in results
+    ]
+    
+    return jsonify(professionals)

@@ -124,8 +124,8 @@ class CareerForm(FlaskForm):
 class ProfessionalForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    linkedin_id = StringField('LinkedIn ID')
+    email = StringField('Email', validators=[DataRequired(message="Please provide your email address."), Email(message='email must be unique')])
+    linkedin_id = StringField('LinkedIn ID',  validators=[DataRequired(message='linkedin url must be unique')])
     career_id = SelectField('Career', choices=[],coerce=int)
     submit = SubmitField('Submit')
 
@@ -156,3 +156,6 @@ class CommunityForm(FlaskForm):
 )
 
     submit = SubmitField('Add Community')
+
+
+

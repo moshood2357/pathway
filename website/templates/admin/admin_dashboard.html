@@ -56,21 +56,6 @@
 <div class="container py-5">
     <div class="row justify-content-center g-4">
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="flash-container position-fixed top-0 translate-middle-x mt-3" style="left: 65%; z-index: 1050; width: auto; max-width: 480px;">
-      {% for ca, mesg in messages %}
-        <div class="alert alert-{{ ca }} alert-dismissible fade show shadow mb-2" role="alert">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="small">{{ mesg }}</span>
-            <button type="button" class="btn-close btn-close-white btn-sm bg-primary-subtle rounded-4" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
 
         <!-- Total Users -->
         <div class="col-md-4">
@@ -120,12 +105,12 @@
         </button>
     </li>
      <li class="nav-item">
-        <button type="button" class="nav-link active" data-tab="professionalsTab" data-bs-toggle="none">
+        <button type="button" class="nav-link" data-tab="professionalsTab" data-bs-toggle="none">
             Manage professionals
         </button>
     </li>
      <li class="nav-item">
-        <button type="button" class="nav-link active" data-tab="communityTab" data-bs-toggle="none">
+        <button type="button" class="nav-link" data-tab="communityTab" data-bs-toggle="none">
             Manage Community
         </button>
     </li>
@@ -550,6 +535,7 @@
             </div>
 
         {% endfor %}
+        
         </tbody>
     </table>
 </div>
@@ -558,7 +544,7 @@
 <div class="modal fade" id="addProfessionalModal" tabindex="-1">
     <div class="modal-dialog">
         <form method="POST" action="{{ url_for('admin.add_professional') }}">
-            {{ add_professional_form.hidden_tag() }}
+            {{ professional_form.hidden_tag() }}
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -568,28 +554,34 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        {{ add_professional_form.first_name.label(class="form-label") }}
-                        {{ add_professional_form.first_name(class="form-control") }}
+                        {{ professional_form.first_name.label(class="form-label") }}
+                        {{ professional_form.first_name(class="form-control") }}
                     </div>
 
                     <div class="mb-3">
-                        {{ add_professional_form.last_name.label(class="form-label") }}
-                        {{ add_professional_form.last_name(class="form-control") }}
+                        {{ professional_form.last_name.label(class="form-label") }}
+                        {{ professional_form.last_name(class="form-control") }}
                     </div>
 
                     <div class="mb-3">
-                        {{ add_professional_form.email.label(class="form-label") }}
-                        {{ add_professional_form.email(class="form-control") }}
+                        {{ professional_form.email.label(class="form-label") }}
+                        {{ professional_form.email(class="form-control") }}
+                        {%  for error in professional_form.email.errors %}
+                          <span class="text-danger">{{ error}}</span>
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
-                        {{ add_professional_form.linkedin_id.label(class="form-label") }}
-                        {{ add_professional_form.linkedin_id(class="form-control") }}
+                        {{ professional_form.linkedin_id.label(class="form-label") }}
+                        {{ professional_form.linkedin_id(class="form-control") }}
+                        {%  for error in professional_form.linkedin_id.errors %}
+                           <span class="text-danger">{{ error}}</span>
+                        {% endfor %}
                     </div>
 
                     <div class="mb-3">
-                        {{ add_professional_form.career_id.label(class="form-label") }}
-                        {{ add_professional_form.career_id(class="form-select") }}
+                        {{ professional_form.career_id.label(class="form-label") }}
+                        {{ professional_form.career_id(class="form-select") }}
                     </div>
                 </div>
 
@@ -783,6 +775,11 @@
 </div>
 
 {% endblock content %}
+    
+{% block customjs %}
+    
+{% endblock customjs %}
+
 
 {% block js %}
 <script>
@@ -791,22 +788,55 @@ window.addEventListener("DOMContentLoaded", function() {
     const tabs = document.querySelectorAll("#adminTabs .nav-link");
     const sections = document.querySelectorAll(".tab-section");
 
-    // Default – show skills tab
-    document.getElementById("skillsTab").classList.add("active");
+    // Function to activate a tab
+    function activateTab(tabName) {
+        tabs.forEach(t => t.classList.remove("active"));
+        sections.forEach(s => s.classList.remove("active"));
 
+        const tabBtn = document.querySelector(`#adminTabs .nav-link[data-tab="${tabName}"]`);
+        const section = document.getElementById(tabName);
+
+        if (tabBtn && section) {
+            tabBtn.classList.add("active");
+            section.classList.add("active");
+            localStorage.setItem("activeAdminTab", tabName);
+        }
+    }
+
+    // Load the last active tab from localStorage or default to skillsTab
+    const lastTab = localStorage.getItem("activeAdminTab") || "skillsTab";
+    activateTab(lastTab);
+
+    // Add click event for all tabs
     tabs.forEach(tab => {
         tab.addEventListener("click", function () {
             const target = this.getAttribute("data-tab");
-
-            // remove active from everything
-            tabs.forEach(t => t.classList.remove("active"));
-            sections.forEach(s => s.classList.remove("active"));
-
-            // activate clicked
-            this.classList.add("active");
-            document.getElementById(target).classList.add("active");
+            activateTab(target);
         });
     });
+
+    // -------------------------------
+    // Modal handling using Flask variable
+    // -------------------------------
+    // Pass the Flask variable to JS safely
+    const openModal = "{{ open_modal | default('', true) }}";
+
+    if (openModal) {
+        let modalElement;
+        if (openModal === 'addSkill') modalElement = document.getElementById('addSkillModal');
+        else if (openModal === 'addCareer') modalElement = document.getElementById('addCareerModal');
+        else if (openModal === 'addProfessional') modalElement = document.getElementById('addProfessionalModal');
+        else if (openModal === 'addCommunity') modalElement = document.getElementById('addCommunityModal');
+
+        if (modalElement) {
+            new bootstrap.Modal(modalElement).show();
+        }
+    }
+
 });
 </script>
+
+
 {% endblock js %}
+
+

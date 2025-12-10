@@ -1,10 +1,13 @@
+from functools import wraps
+from sqlalchemy.exc import IntegrityError
+
 from datetime import datetime, timedelta
 
 from flask import Blueprint, render_template, session, redirect, request, url_for, flash
 from website.forms import LoginForm, AddSkillForm, CareerForm, ProfessionalForm, CommunityForm
 from werkzeug.security import check_password_hash
 from website.models import db, Admin, User, Skill, Career, Professional, Community
-from functools import wraps
+
 
 admin = Blueprint('admin', __name__)
 
@@ -20,6 +23,48 @@ def admin_required(f):
             return redirect(url_for('admin.login'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+# =============================
+#   HELPER FUNCTION FOR MODALS
+# =============================
+def render_dashboard_with_modal(open_modal=None, skill_form=None, career_form=None,
+                                professional_form=None, community_form=None):
+    total_users = User.query.count()
+    last_7_days = datetime.utcnow() - timedelta(days=7)
+    new_signups = User.query.filter(User.reg_date >= last_7_days).count()
+    last_24_hours = datetime.utcnow() - timedelta(days=1)
+    dau = User.query.filter(User.last_login >= last_24_hours).count()
+
+    add_skill_form = skill_form or AddSkillForm()
+    add_career_form = career_form or CareerForm()
+    add_professional_form = professional_form or ProfessionalForm()
+    add_community_form = community_form or CommunityForm()
+
+    add_professional_form.career_id.choices = [(c.career_id, c.career_name) for c in Career.query.all()]
+    add_community_form.career_id.choices = [(c.career_id, c.career_name) for c in Career.query.all()]
+
+    skills = Skill.query.all()
+    careers = Career.query.all()
+    professional = Professional.query.all()
+    communities = Community.query.all()
+
+    return render_template(
+        'admin/admin_dashboard.html',
+        total_users=total_users,
+        add_skill_form=add_skill_form,
+        add_career_form=add_career_form,
+        professional_form=add_professional_form,
+        add_community_form=add_community_form,
+        skills=skills,
+        careers=careers,
+        professional=professional,
+        communities=communities,
+        active_tab=open_modal.replace('add', '').lower() if open_modal else 'skills',
+        open_modal=open_modal,
+        new_signups=new_signups,
+        dau=dau
+    )
 
 
 # Avoid caching admin pages after logout
@@ -116,19 +161,36 @@ def dashboard():
 
     # Handle Professional creation
     if add_professional_form.validate_on_submit() and add_professional_form.submit.data:
-        new_professional = Professional(
+         
+         linkedin_id = add_professional_form.linkedin_id.data.strip()
+         email = add_professional_form.email.data.strip().lower()
+
+         new_professional = Professional(
             first_name=add_professional_form.first_name.data,
             last_name=add_professional_form.last_name.data,
-            email=add_professional_form.email.data,
-            linkedin_id=add_professional_form.linkedin_id.data,
+            email=email,
+            linkedin_id=linkedin_id,
             career_id=add_professional_form.career_id.data
-        )
-        db.session.add(new_professional)
-        db.session.commit()
-        flash('Professional added successfully!', 'success')
-        return redirect(url_for('admin.dashboard', tab='professionals'))
+         )
 
-    # Handle Community Link creation  <-- NEW BLOCK
+         db.session.add(new_professional)
+
+         try:
+             db.session.commit()
+             flash('Professional added successfully!', 'success')
+         except IntegrityError as e:
+             db.session.rollback()
+             if 'linkedin_id' in str(e.orig):
+                 flash('This LinkedIn ID already exists. Please use a unique one.', 'error')
+             elif 'email' in str(e.orig):
+                 flash('This email already exists. Please use a unique one.', 'error')
+             else:
+                 flash('Error: Duplicate entry detected. Please use unique values.', 'error')
+
+
+        #  return redirect(url_for('admin.dashboard', tab='professionals'))
+
+    # Handle Community Link creation 
     if add_community_form.validate_on_submit() and add_community_form.submit.data:
         community_link = add_community_form.community_link.data.strip() or None
 
@@ -148,7 +210,7 @@ def dashboard():
         total_users=total_users,
         add_skill_form=add_skill_form,
         add_career_form=add_career_form,
-        add_professional_form=add_professional_form,
+        professional_form=add_professional_form,
         add_community_form=add_community_form,  # NEW
         skills=skills,
         careers=careers,
@@ -267,31 +329,48 @@ def delete_career(career_id):
 @admin_required
 def add_professional():
     form = ProfessionalForm()
-
-    form.career_id.choices = [
-        (c.career_id, c.career_name)
-        for c in Career.query.all()
-    ]
+    form.career_id.choices = [(c.career_id, c.career_name) for c in Career.query.all()]
 
     if form.validate_on_submit():
+        linkedin_id = form.linkedin_id.data.strip()
+        email = form.email.data.strip().lower()
+
         new_professional = Professional(
-            first_name=form.first_name.data,
-            last_name=form.last_name.data,
-            email=form.email.data,
-            linkedin_id=form.linkedin_id.data,
+            first_name=form.first_name.data.strip(),
+            last_name=form.last_name.data.strip(),
+            email=email,
+            linkedin_id=linkedin_id,
             career_id=form.career_id.data
         )
 
         db.session.add(new_professional)
-        db.session.commit()
 
-        flash(f'Professional "{form.first_name.data} {form.last_name.data}" added successfully!', 'msg')
-        return redirect(url_for('admin.dashboard', tab='professionalsTab'))
+        try:
+            db.session.commit()
+            flash(f'Professional "{form.first_name.data} {form.last_name.data}" added successfully!', 'success')
+            return redirect(url_for('admin.dashboard', tab='professionalsTab'))
+        except IntegrityError as e:
+            db.session.rollback()
+            error_msg = str(e.orig)
+            if 'email' in error_msg:
+                flash('This email already exists. Please use a unique one.', 'error')
+            elif 'linkedin_id' in error_msg:
+                flash('This LinkedIn ID already exists. Please use a unique one.', 'error')
+            else:
+                flash('An error occurred. Please try again.', 'error')
+
+        # return redirect(url_for('admin.dashboard', tab='professionalsTab'))
 
     if form.errors:
-        flash('Error adding professional. Please check your input.', 'errormsg')
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
+    
 
-    return redirect(url_for('admin.dashboard', tab='professionalsTab'))
+    return render_dashboard_with_modal(open_modal='addProfessional', professional_form=form)
+
+    
+
 
 
 @admin.route('/edit_professional/<int:professional_id>', methods=['POST'])

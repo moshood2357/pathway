@@ -40,19 +40,25 @@
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 20px;
     }
-
-    h1 {
-        color: #343a40;
-        margin-bottom: 30px;
-    }
 </style>
 {% endblock style %}
 
 {% block content %}
-<div class="content-wrapper container py-4">
-    <h1 class="text-center">List of Professionals</h1>
-    {% if pro %}
-    <div class="cards-wrapper">
+<div class="container py-4">
+    <h1 class="text-center mb-4">List of Professionals</h1>
+
+    <!-- SEARCH INPUT -->
+    <div class="mb-4">
+        <input 
+            type="text"
+            id="professionalSearch"
+            class="form-control"
+            placeholder="Search professionals by name, email, LinkedIn, or career..."
+        >
+    </div>
+
+    <!--  Professionals Container -->
+    <div id="professionalContainer" class="cards-wrapper">
         {% for p in pro %}
         <div class="professional-card bg-white">
             <h3 class="professional-name mb-2">{{ p.first_name }} {{ p.last_name }}</h3>
@@ -70,8 +76,88 @@
         </div>
         {% endfor %}
     </div>
-    {% else %}
-        <p class="text-center text-muted mt-4">No professionals found.</p>
-    {% endif %}
+
+    <!--  Hidden original list for resetting -->
+    <div id="initialProfessionalCards" style="display: none;">
+        {% for p in pro %}
+        <div class="professional-card bg-white">
+            <h3 class="professional-name mb-2">{{ p.first_name }} {{ p.last_name }}</h3>
+            <ul class="professional-info list-unstyled mb-0">
+                <li><strong>Email:</strong> {{ p.email }}</li>
+                <li><strong>LinkedIn:</strong> 
+                    {% if p.linkedin_id %}
+                        <a href="{{ p.linkedin_id }}" target="_blank">{{ p.linkedin_id }}</a>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </li>
+                <li><strong>Expertise:</strong> {{ p.career.career_name }}</li>
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock content %}
+
+{% block js %}
+{{ super() }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    let debounceTimer;
+
+    $("#professionalSearch").on("keyup", function () {
+        clearTimeout(debounceTimer);
+        let query = $(this).val().trim();
+
+        debounceTimer = setTimeout(function () {
+            const container = $("#professionalContainer");
+
+            if (!query) {
+                container.html($("#initialProfessionalCards").html());
+                return;
+            }
+
+            $.ajax({
+                url: "{{ url_for('views.search_professionals') }}",
+                method: "GET",
+                data: { q: query },
+                dataType: "json",
+                success: function(response) {
+                    container.empty();
+
+                    if (response.length === 0) {
+                        container.append('<p class="text-muted">No professionals found.</p>');
+                        return;
+                    }
+
+                    response.forEach(function(p) {
+                        const card = `
+                        <div class="professional-card bg-white">
+                            <h3 class="professional-name mb-2">${p.first_name} ${p.last_name}</h3>
+                            <ul class="professional-info list-unstyled mb-0">
+                                <li><strong>Email:</strong> ${p.email}</li>
+                                <li><strong>LinkedIn:</strong> 
+                                    ${p.linkedin_id 
+                                        ? `<a href="${p.linkedin_id}" target="_blank">${p.linkedin_id}</a>` 
+                                        : 'N/A'
+                                    }
+                                </li>
+                                <li><strong>Expertise:</strong> ${p.career}</li>
+                            </ul>
+                        </div>`;
+                        container.append(card);
+                    });
+                },
+                error: function() {
+                    console.error("Search failed");
+                }
+            });
+
+        }, 300);
+    });
+});
+</script>
+{% endblock js %}
