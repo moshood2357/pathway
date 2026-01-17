@@ -347,17 +347,20 @@ def add_professional():
 
         try:
             db.session.commit()
-            flash(f'Professional "{form.first_name.data} {form.last_name.data}" added successfully!', 'success')
+            # flash(f'Professional "{form.first_name.data} {form.last_name.data}" added successfully!', 'success')
             return redirect(url_for('admin.dashboard', tab='professionalsTab'))
         except IntegrityError as e:
             db.session.rollback()
-            error_msg = str(e.orig)
+            error_msg = str(e.orig).lower()
+
             if 'email' in error_msg:
-                flash('This email already exists. Please use a unique one.', 'error')
+                form.email.errors.append('This email already exists.')
             elif 'linkedin_id' in error_msg:
-                flash('This LinkedIn ID already exists. Please use a unique one.', 'error')
-            else:
-                flash('An error occurred. Please try again.', 'error')
+                form.linkedin_id.errors.append('This LinkedIn URL already exists.')
+            # else:
+            #     form.errors.setdefault('database', []).append(
+            #         'Duplicate entry detected.'
+            #     )
 
         # return redirect(url_for('admin.dashboard', tab='professionalsTab'))
 
@@ -377,15 +380,27 @@ def add_professional():
 @admin_required
 def edit_professional_route(professional_id):
     professional = Professional.query.get_or_404(professional_id)
+    form = ProfessionalForm(obj=professional)
+    
+    if form.validate_on_submit():
+        professional.first_name = request.form.get('first_name')
+        professional.last_name = request.form.get('last_name')
+        professional.email = request.form.get('email')
+        professional.linkedin_id = request.form.get('linkedin_id')
+        professional.career_id = request.form.get('career_id')
 
-    professional.first_name = request.form.get('first_name')
-    professional.last_name = request.form.get('last_name')
-    professional.email = request.form.get('email')
-    professional.linkedin_id = request.form.get('linkedin_id')
-    professional.career_id = request.form.get('career_id')
+        try:
+            db.session.commit()
+            # flash(f'Professional "{form.first_name.data} {form.last_name.data}" added successfully!', 'success')
+            # return redirect(url_for('admin.dashboard', tab='professionalsTab'))
+        except IntegrityError as e:
+            db.session.rollback()
+            error_msg = str(e.orig).lower()
 
-    db.session.commit()
-    return redirect(url_for('admin.dashboard', tab='professionalsTab'))
+            if 'email' in error_msg:
+                professional.email.errors.append('This email already exists.')
+            elif 'linkedin_id' in error_msg:
+                professional.linkedin_id.errors.append('This LinkedIn URL already exists.')
 
 
 @admin.route('/delete_professional/<int:professional_id>')
