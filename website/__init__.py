@@ -14,10 +14,9 @@ mail = Mail()
 def create_app():
     from website import config
     from website.models import db
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
     app.config.from_pyfile('config.py',silent=True)
     app.config.from_object(config.LiveConfig)
-    app.secret_key ='979105ce4e5f8d0d244e4ab2f9043fee07153d0ecf7dabacbb295c3792e0c1d5'
     # instance_relative_config=True
     csrf = CSRFProtect(app)
 
